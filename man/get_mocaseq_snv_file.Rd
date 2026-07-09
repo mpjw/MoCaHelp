@@ -2,7 +2,7 @@
 % Please edit documentation in R/io.R
 \name{get_mocaseq_snv_file}
 \alias{get_mocaseq_snv_file}
-\title{IO code for MoCaSeq}
+\title{Build path to SNP file in MoCaSeq results}
 \usage{
 get_mocaseq_snv_file(
   sample_name,
@@ -27,11 +27,6 @@ mutations E.g. "Positions", "NoCommonSNPs"}
 obtain the results found. One of "bash", or "nextflow". Default: "bash"}
 }
 \description{
-Functions for building paths, and reading or writing data related to the
-MoCaSeq pipeline
-Build path to SNP file in MoCaSeq results
-}
-\details{
 MoCaSeq uses MuTect2 for mutation calling, this function creates the standard
 path to the (postprocessed) SNP file given the sample name and sample type.
 Please note, cancer genomics requires discerning germline and somatic

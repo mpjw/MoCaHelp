@@ -3,6 +3,112 @@
 #' Functions for building paths, and reading or writing data related to the
 #' MoCaSeq pipeline
 
+MUTECT2_COLUMN_NAMES_BASH <- c(
+  "CHROM",
+  "POS",
+  "REF",
+  "ALT",
+  "GEN[Tumor].AF",
+  "GEN[Tumor].AD[0]",
+  "GEN[Tumor].AD[1]",
+  "GEN[Normal].AD[0]",
+  "GEN[Normal].AD[1]",
+  "ANN[*].GENE",
+  "ANN[*].EFFECT",
+  "ANN[*].IMPACT",
+  "ANN[*].FEATUREID",
+  "ANN[*].HGVS_C",
+  "ANN[*].HGVS_P",
+  "dbNSFP_MetaLR_pred",
+  "dbNSFP_MetaSVM_pred",
+  "ID",
+  "G5",
+  "CAF",
+  "AC",
+  "AN",
+  "AF",
+  "CNT_Coding",
+  "CNT_NonCoding",
+  "CLNDN",
+  "CLNSIG",
+  "CLNREVSTAT",
+  "dbNSFP_SIFT_pred",
+  "dbNSFP_Polyphen2_HDIV_pred",
+  "dbNSFP_Polyphen2_HVAR_pred",
+  "dbNSFP_PROVEAN_pred"
+)
+
+MUTECT2_COLUMN_NAMES_NEXTFLOW <- c(
+  "CHROM",
+  "POS",
+  "REF",
+  "ALT",
+  "GEN.Tumor..AF",
+  "GEN.Tumor..AD.0.",
+  "GEN.Tumor..AD.1.",
+  "GEN.Normal..AD.0.",
+  "GEN.Normal..AD.1.",
+  "ANN....GENE",
+  "ANN....EFFECT",
+  "ANN....IMPACT",
+  "ANN....FEATUREID",
+  "ANN....HGVS_C",
+  "ANN....HGVS_P",
+  "dbNSFP_MetaLR_pred",
+  "dbNSFP_MetaSVM_pred",
+  "ID",
+  "G5",
+  "CAF",
+  "AC",
+  "AN",
+  "AF",
+  "CNT_Coding",
+  "CNT_NonCoding",
+  "CLNDN",
+  "CLNSIG",
+  "CLNREVSTAT",
+  "dbNSFP_SIFT_pred",
+  "dbNSFP_Polyphen2_HDIV_pred",
+  "dbNSFP_Polyphen2_HVAR_pred",
+  "dbNSFP_PROVEAN_pred"
+)
+
+# TODO: tidy standard names and propagate thought code bases
+MUTECT2_COLUMN_NAMES_STANDARD <- c(
+  "CHROM", # "Chrom",
+  "POS", # "Pos",
+  "REF", # "Ref",
+  "ALT", # "Alt",
+  "TumorAF", # "Tumor_AF",
+  "TumorRefC", # "Tumor_Ref_Count",
+  "TumorAltC", # "Tumor_Alt_Count",
+  "NormalRefC",
+  "NormalAltC",
+  "GENE",
+  "EFFECT",
+  "IMPACT",
+  "FEATUREID",
+  "HGVS_C",
+  "HGVS_P",
+  "dbNSFP_MetaLR_pred",
+  "dbNSFP_MetaSVM_pred",
+  "ID",
+  "G5",
+  "CAF",
+  "AC",
+  "AN",
+  "AF",
+  "CNT_Coding",
+  "CNT_NonCoding",
+  "CLNDN",
+  "CLNSIG",
+  "CLNREVSTAT",
+  "dbNSFP_SIFT_pred",
+  "dbNSFP_Polyphen2_HDIV_pred",
+  "dbNSFP_Polyphen2_HVAR_pred",
+  "dbNSFP_PROVEAN_pred"
+)
+
 #' Build path to SNP file in MoCaSeq results
 #'
 #' MoCaSeq uses MuTect2 for mutation calling, this function creates the standard
@@ -187,7 +293,7 @@ get_mocaseq_cnv_file <- function(
 #' variant desired (i.e. germline or somatic).
 #'
 #' @param sample_name Character sample name from MoCaSeq run
-#' @param result_type Character type of results to get. One of "segments", 
+#' @param result_type Character type of results to get. One of "segments",
 #' "variants", or "variants_for_LOH". Default: "variants_for_LOH".
 #' @param variant_type Character variant type one of "germline" or "somatic"
 get_mocaseq_loh_file <- function(
@@ -299,7 +405,7 @@ get_mocaseq_path <- function(
 
 #' Parse available CNV caller results form MoCaSeq folder
 #'
-#' Infer method used for copy number variation calling from MoCaSeq restults 
+#' Infer method used for copy number variation calling from MoCaSeq restults
 #' folder.
 #'
 #' @param sample_id Character sample id.
@@ -321,4 +427,51 @@ get_mocaseq_cna_callers <- function(
   }
 
   unlist(lapply(X = COPY_NUMBER_CALLERS, FUN = check_cna_caller_exists))
+}
+
+#' Lead SNV data from file using data.table
+#'
+#' Wrapper for loading snv data from MoCaSeq results. Standardizes column names.
+#'
+#' @param snv_file Character path to snv file.
+#' @param pipeline_version Character indicating MoCaSeq version. One of "bash"
+#' or "nextflow". Default: NULL (i.e. auto detect)
+#' @param keep_columns Character vector of column names to keep.
+#' @param ... Parameters used for data.table::fread() downstream.
+load_snv_file <- function(
+  snv_file,
+  pipeline_version = NULL,
+  keep_columns = NULL, # c("CHROM", "POS", "REF", "ALT")
+  ...
+) {
+  # load data (TODO fill missing values, fill = TRUE ?)
+  .dt.snv <- data.table::fread(snv_file, ...)
+
+  # detect pipeline version
+  if (is.null(pipeline_version)) {
+    pipeline_version <- detect_mocaseq_version(dirname(dirname(snv_file)))
+  }
+
+  # select column name mapping based on pipeline version
+  .colnames.version <- switch(
+    pipeline_version,
+    bash = MUTECT2_COLUMN_NAMES_BASH,
+    nextflow = MUTECT2_COLUMN_NAMES_NEXTFLOW,
+    stop(paste0("Unknown 'pipeline_version': ", pipeline_version))
+  )
+
+  # standardize column names
+  data.table::setnames(
+    x = .dt.snv,
+    old = .colnames.version,
+    new = MUTECT2_COLUMN_NAMES_STANDARD
+  )
+
+  # apply filter on standard column names
+  if (!is.null(keep_columns)) {
+    stopifnot(all(keep_columns %in% colnames(.dt.snv)))
+    .dt.snv <- .dt.snv[, keep_columns, with = FALSE]
+  }
+
+  .dt.snv
 }

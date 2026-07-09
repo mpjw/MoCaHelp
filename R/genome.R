@@ -90,7 +90,7 @@ define_chromosome_sizes <- function(species = "Human", only_autosomes = TRUE) {
 #' Version 2 uses data.table::fread instead of read.table.
 #' TODO: remove undefined dependencies
 #'
-#' @param chromosome_sizes Integer vector of chomosome sizes with chromosome 
+#' @param chromosome_sizes Integer vector of chomosome sizes with chromosome
 #' names
 #' @param count_data Character path to count data
 #' @param method Character tool name for copy number calling or LOH.
@@ -125,21 +125,19 @@ convert_genomic_to_continuous_axis <- function(dt_bins) {
   dt_bins[, end := as.numeric(end)]
   # TODO: try leverage base::cumsum here
   Len <- dt_bins[Chrom == 1, max(end)]
-  LabelPos = Len / 2
-  Lentmp = Len
-  chromosomes = as.character(dt_bins[Chrom != 1, unique(Chrom)])
+  LabelPos <- Len / 2
+  Lentmp <- Len
+  chromosomes <- as.character(dt_bins[Chrom != 1, unique(Chrom)])
   dt_bins[Chrom == 1, plotstart := start]
   dt_bins[Chrom == 1, plotend := end]
   for (chromosome in chromosomes) {
     Lentmp <- Lentmp + dt_bins[Chrom == chromosome, max(end)]
     dt_bins[Chrom == chromosome, plotstart := start + max(Len)]
     dt_bins[Chrom == chromosome, plotend := end + max(Len)]
-    labelpos = (max(dt_bins[Chrom == chromosome, "end"]) / 2) +
+    labelpos <- (max(dt_bins[Chrom == chromosome, "end"]) / 2) +
       (max(Len) / 2)
-    LabelPos = c(LabelPos, labelpos)
-    Len = c(Len, Lentmp)
+    LabelPos <- c(LabelPos, labelpos)
+    Len <- c(Len, Lentmp)
   }
   return(dt_bins)
 }
-
-

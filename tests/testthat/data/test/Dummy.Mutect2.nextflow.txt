@@ -1,0 +1,2 @@
+CHROM	POS	REF	ALT	GEN.Tumor..AF	GEN.Tumor..AD.0.	GEN.Tumor..AD.1.	GEN.Normal..AD.0.	GEN.Normal..AD.1.	ANN....GENE	ANN....EFFECT	ANN....IMPACT	ANN....FEATUREID	ANN....HGVS_C	ANN....HGVS_P	dbNSFP_MetaLR_pred	dbNSFP_MetaSVM_pred	ID	G5	CAF	AC	AN	AF	CNT_Coding	CNT_NonCoding	CLNDN	CLNSIG	CLNREVSTAT	dbNSFP_SIFT_pred	dbNSFP_Polyphen2_HDIV_pred	dbNSFP_Polyphen2_HVAR_pred	dbNSFP_PROVEAN_pred
+1	3948324	C	T	0.389	32	20	31	0	FOOHD1	missense_variant	MODERATE	ENST00000974382.1	c.1490G>T	p.Trp497Ile	D	T	false	0	0	0	D,D,.,.,D	P,P,.,.,.	P,P,.,.,.	D,D,.,.,D
