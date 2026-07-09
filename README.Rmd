@@ -1,0 +1,67 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# MoCaHelp
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of MoCaHelp is to provide ancillary functions for working with MoCaSeq.
+One focus is I/O, in particular building paths to result files and loading types
+of result data.
+
+## Installation
+
+You can install the development version of MoCaHelp from [GitHub](https://github.com/mpjw/MoCaHelp) with:
+
+``` r
+# install.packages("pak")
+pak::pak("mpjw/MoCaHelp")
+```
+
+## Example
+This a basic example for building paths to some common results files from MoCaSeq.
+
+```{r example}
+library(MoCaHelp)
+# single nucleotide variant example filtering for only cancer gene consensus (CGC) variants
+get_mocaseq_path(
+  sample_name = "SAMPLE_042_TUMOR",
+  sample_type = "matched",
+  tool_name = "Mutect2",
+  postprocessing = "CGC",
+  base_path = "/storage/path",
+  ignore_not_existing = TRUE
+)
+
+# copy number variants example
+get_mocaseq_path(
+  sample_name = "SAMPLE_042_TUMOR",
+  sample_type = "matched",
+  tool_name = "CNVKit",
+  result_type = "segments",
+  base_path = "/storage/path",
+  ignore_not_existing = TRUE
+)
+
+# loff of heterozygocity example
+get_mocaseq_path(
+  sample_name = "SAMPLE_042_TUMOR",
+  sample_type = "matched",
+  tool_name = "LOH",
+  base_path = "/storage/path",
+  ignore_not_existing = TRUE
+)
+```
