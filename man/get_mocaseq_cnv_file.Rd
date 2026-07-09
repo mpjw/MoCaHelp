@@ -25,8 +25,6 @@ get_mocaseq_cnv_file(
 
 \item{seg_size}{Integer, segment size of HMMCopy output, only used in case
 of \code{cnv_caller = "HMMCopy"}.}
-
-\item{data_path}{Character, path to results (default: current working dir).}
 }
 \description{
 Copy number segment (cns) files produced by MoCaSeq can be either from

@@ -87,11 +87,13 @@ define_chromosome_sizes <- function(species = "Human", only_autosomes = TRUE) {
 
 #' Process count data from LOH
 #'
+#' Version 2 uses data.table::fread instead of read.table.
+#' TODO: remove undefined dependencies
+#'
 #' @param chromosome_sizes Integer vector of chomosome sizes with chromosome 
 #' names
 #' @param count_data Character path to count data
 #' @param method Character tool name for copy number calling or LOH.
-#' @note version 2 uses data.table::fread instead of read.table
 process_count_data <- function(
   chromosome_sizes,
   count_data = "",
@@ -118,7 +120,7 @@ process_count_data <- function(
 #' * end
 convert_genomic_to_continuous_axis <- function(dt_bins) {
   dt_bins[, Chrom := as.numeric(Chrom)]
-  setorder(dt_bins, Chrom)
+  data.table::setorder(dt_bins, Chrom)
   dt_bins[, start := as.numeric(start)]
   dt_bins[, end := as.numeric(end)]
   # TODO: try leverage base::cumsum here
@@ -141,154 +143,3 @@ convert_genomic_to_continuous_axis <- function(dt_bins) {
 }
 
 
-# QC: given a bam file and a data.table with mutations (chrom, pos, pos), will return MAPQ and BAQ values for the mutation position
-calculate_mapq_baq <- function(inputbam, inputSNV, tempfolder) {
-  # tempfolder <- "/home/rad/Downloads/temp4/" # for samtools and jvarkit calculations
-  # inputbam <- copy(tbam)
-  # inputSNV <- copy(SNVs)
-
-  # first check if index was found, else try to copy or stop (we could execute samtools index here as well)
-  indexname1 <- paste0(inputbam, ".bai") # this was what we need
-  indexname2 <- gsub("\\.bam$", ".bai", inputbam) # sometimes this is the filename
-  if (!file.exists(indexname1)) {
-    if (file.exists(indexname2)) {
-      file.copy(indexname2, indexname1)
-    } else {
-      stop("No index file for BAM found, please rerun samtools index first")
-    }
-  }
-
-  inputbed <- unique(inputSNV[, .(CHROM, POS, POS)])
-
-  outbam.file <- paste0(tempfolder, "/", name, "_snv-regions.bam")
-  regionString <- paste0(
-    inputbed[, paste0(CHROM, ":", POS, "-", POS)],
-    collapse = " "
-  ) # like this, since -L is slow and gives weird results
-  command1 <- paste0(
-    "samtools view -bh -F 4 -F 1024 ",
-    inputbam,
-    " ",
-    regionString,
-    " > ",
-    outbam.file
-  )
-  system(command1)
-
-  outbam.file2 <- paste0(tempfolder, "/", name, "_snv-regions-sorted.bam")
-  command2 <- paste0("samtools sort -f ", outbam.file, " ", outbam.file2)
-  system(command2)
-
-  command3 <- paste0("samtools index ", outbam.file2)
-  system(command3)
-
-  outstats.file <- paste0(tempfolder, "/", name, "_snv-regions.stats")
-  command4 <- paste0(
-    "java -jar /home/rad/packages/jvarkit/dist/sam2tsv.jar -R /fast/GRCh38.p12/GRCh38.p12.fna ",
-    outbam.file,
-    " > ",
-    outstats.file
-  )
-  system(command4)
-
-  # read and process the QC data
-  readstats <- fread(outstats.file)
-
-  file.remove(
-    outbam.file,
-    outbam.file2,
-    paste0(outbam.file2, ".bai"),
-    outstats.file
-  )
-
-  colnames(readstats) <- gsub("-", "", colnames(readstats))
-  setnames(readstats, "#ReadName", "ReadName")
-  readstats <- unique(readstats)
-  readstats[, baseID := .I]
-  readstats[READQUAL != ".", READQUALNUM := utf8ToInt(READQUAL), by = baseID]
-  readstats[, READQUALNUM := READQUALNUM - 33]
-  readstats[, mutID2 := paste(CHROM, REFPOS1, REFBASE, READBASE, sep = "-")]
-  readstats[, CHROM := as.character(CHROM)]
-
-  # assign mutation positions
-  subs.positions <- inputSNV[type %in% c("SNV", "MNV"), POS]
-  indel.positions <- inputSNV[type %in% c("del", "ins", "dup"), POS]
-
-  # only get MAPQ for these mutations
-  if (length(indel.positions) >= 1) {
-    readstats.indels <- readstats[REFPOS1 %in% indel.positions]
-    readstats.indels <- unique(readstats.indels[,
-      .(POS = as.numeric(REFPOS1), MAPQ = mean(MAPQ, na.rm = T), BAQ = NA),
-      by = .(CHROM, REFPOS1)
-    ])
-    readstats.indels[, REFPOS1 := NULL]
-  } else {
-    readstats.indels <- data.table()
-  }
-
-  # only single/multi nucleotide variants
-  readstats <- readstats[REFPOS1 %in% subs.positions]
-
-  # remove all reads with REF=ALT
-  readstats <- readstats[READBASE != REFBASE]
-
-  inputSNV[,
-    mutID2 := paste(CHROM, POS, substr(REF, 1, 1), substr(ALT, 1, 1), sep = "-")
-  ] # this way we include multi substitutions and insertions
-  readstats <- merge(
-    readstats,
-    inputSNV[, .(mutID, mutID2, REF)],
-    by = "mutID2",
-    all.x = T
-  )
-
-  # here we remove mutations which are at the given locations but show a different base substitution (e.g. C>T but there is also a C>A which is removed)
-  readstats <- readstats[!is.na(REF)]
-
-  # reduce to single information per mutation
-  readstats <- unique(readstats[,
-    .(MAPQ = mean(MAPQ, na.rm = T), BAQ = mean(READQUALNUM, na.rm = T)),
-    by = .(mutID)
-  ])
-
-  # first bind the simple mutations onto the output using mutation ID, then indels only based on CHROM/POS
-  readstats <- merge(
-    inputSNV[POS %in% subs.positions],
-    readstats,
-    by = c("mutID")
-  )
-  readstats.indels <- merge(
-    inputSNV[POS %in% indel.positions],
-    readstats.indels,
-    by = c("CHROM", "POS"),
-    all.x = T
-  )
-
-  # merging by CHROM/POS is dangerous, since there can be a SNV at the same position as an indel, we catch it like this
-  readstats.indels <- readstats.indels[!grepl(">", HGVS_C)]
-
-  outputSNV <- rbind(readstats, readstats.indels)
-
-  # some mutations are only found in the m2 bam from Mutect2, here we flag these
-
-  errorSNV <- inputSNV[!inputSNV$mutID %in% outputSNV$mutID]
-  errorSNV[, MAPQ := 0]
-  errorSNV[, BAQ := 0]
-  outputSNV <- rbind(outputSNV, errorSNV)
-
-  if (nrow(inputSNV) != nrow(outputSNV)) {
-    stop("error A")
-    # test1 <- merge(inputSNV[POS %in% subs.positions], readstats, by=c("mutID"))
-    # test2 <- merge(inputSNV[POS %in% indel.positions], readstats.indels, by=c("CHROM", "POS"), all.x=T)
-    # outputSNV <- rbind(test1, test2)
-    # nrow(outputSNV)
-    # nrow(inputSNV)
-  }
-
-  setcolorder(outputSNV, colnames(inputSNV))
-  outputSNV[, mutID2 := NULL]
-  outputSNV[, MAPQ := round(MAPQ, digits = 1)]
-  outputSNV[, BAQ := round(BAQ, digits = 2)]
-
-  return(outputSNV)
-}

@@ -22,7 +22,18 @@ get_mocaseq_path(
 
 \item{tool_name}{Character name of tool from MoCaSeq pipeline}
 
-\item{base_path}{Character of path to directory with MoCaSeq output
+\item{base_path}{Character of path to directory with MoCaSeq output}
+
+\item{variant_type}{Character type of variants to get. One of "germline",
+"somatic", or "mixed". Default: "mixed"}
+
+\item{ignore_not_existing}{Logical wether to ignore if the created path
+exists on system and return the path anyway. If not ignored a warning will be
+raised and NULL returned. Default: FALSE}
+
+\item{verbose}{Logical, wether to print details during execution.}
+
+\item{...}{Downstream parameter, specific to tool specific functions
 
 TODO: expand/recycle parameters other than sample_name if multiple sample
 names are provided}

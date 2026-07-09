@@ -15,8 +15,6 @@ names}
 \item{method}{Character tool name for copy number calling or LOH.}
 }
 \description{
-Process count data from LOH
-}
-\note{
-version 2 uses data.table::fread instead of read.table
+Version 2 uses data.table::fread instead of read.table.
+TODO: remove undefined dependencies
 }

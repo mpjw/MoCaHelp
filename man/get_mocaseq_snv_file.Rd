@@ -18,8 +18,13 @@ get_mocaseq_snv_file(
 \item{sample_type}{Character, one of "Tumor", "Normal", "matched" indicating
 type of sample}
 
+\item{mutation_caller}{Character name of method use to infer SNVs}
+
 \item{postprocessing}{Character, describing postprocessing applied to
 mutations E.g. "Positions", "NoCommonSNPs"}
+
+\item{pipeline_version}{Character indicating MoCaSeq pipeline version used to
+obtain the results found. One of "bash", or "nextflow". Default: "bash"}
 }
 \description{
 Functions for building paths, and reading or writing data related to the

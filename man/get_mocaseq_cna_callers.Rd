@@ -6,6 +6,12 @@
 \usage{
 get_mocaseq_cna_callers(sample_id, result_dir_path = ".")
 }
+\arguments{
+\item{sample_id}{Character sample id.}
+
+\item{result_dir_path}{Character path to result directory. Default: "."}
+}
 \description{
-Parse available CNV caller results form MoCaSeq folder
+Infer method used for copy number variation calling from MoCaSeq restults
+folder.
 }

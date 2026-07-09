@@ -17,6 +17,9 @@
 #'  type of sample
 #' @param postprocessing Character, describing postprocessing applied to
 #'  mutations E.g. "Positions", "NoCommonSNPs"
+#' @param mutation_caller Character name of method use to infer SNVs
+#' @param pipeline_version Character indicating MoCaSeq pipeline version used to
+#'  obtain the results found. One of "bash", or "nextflow". Default: "bash"
 get_mocaseq_snv_file <- function(
   sample_name,
   sample_type,
@@ -131,7 +134,6 @@ detect_mocaseq_cnv_caller <- function(results_path) {
 #' @param sample_name Character, name of sample
 #' @param sample_type Character, type of sample ("Tumor", "Normal", or
 #'  "matched")
-#' @param data_path Character, path to results (default: current working dir).
 #' @param cnv_caller Character, name of CNV caller ("CNVKit", "HMMCopy" or
 #'  "Copywriter")
 #' @param result_type Character, type of CNV result ("segments", "log2RR")
@@ -185,6 +187,8 @@ get_mocaseq_cnv_file <- function(
 #' variant desired (i.e. germline or somatic).
 #'
 #' @param sample_name Character sample name from MoCaSeq run
+#' @param result_type Character type of results to get. One of "segments", 
+#' "variants", or "variants_for_LOH". Default: "variants_for_LOH".
 #' @param variant_type Character variant type one of "germline" or "somatic"
 get_mocaseq_loh_file <- function(
   sample_name,
@@ -223,6 +227,13 @@ get_mocaseq_loh_file <- function(
 #' @param sample_type Character sample type, one of Tumor, matched or Normal
 #' @param tool_name Character name of tool from MoCaSeq pipeline
 #' @param base_path Character of path to directory with MoCaSeq output
+#' @param variant_type Character type of variants to get. One of "germline",
+#' "somatic", or "mixed". Default: "mixed"
+#' @param ignore_not_existing Logical wether to ignore if the created path
+#' exists on system and return the path anyway. If not ignored a warning will be
+#' raised and NULL returned. Default: FALSE
+#' @param verbose Logical, wether to print details during execution.
+#' @param ... Downstream parameter, specific to tool specific functions
 #'
 #' TODO: expand/recycle parameters other than sample_name if multiple sample
 #' names are provided
@@ -287,6 +298,12 @@ get_mocaseq_path <- function(
 }
 
 #' Parse available CNV caller results form MoCaSeq folder
+#'
+#' Infer method used for copy number variation calling from MoCaSeq restults 
+#' folder.
+#'
+#' @param sample_id Character sample id.
+#' @param result_dir_path Character path to result directory. Default: "."
 get_mocaseq_cna_callers <- function(
   sample_id,
   result_dir_path = "."

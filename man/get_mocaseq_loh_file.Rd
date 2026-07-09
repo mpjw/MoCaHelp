@@ -13,6 +13,9 @@ get_mocaseq_loh_file(
 \arguments{
 \item{sample_name}{Character sample name from MoCaSeq run}
 
+\item{result_type}{Character type of results to get. One of "segments",
+"variants", or "variants_for_LOH". Default: "variants_for_LOH".}
+
 \item{variant_type}{Character variant type one of "germline" or "somatic"}
 }
 \description{
