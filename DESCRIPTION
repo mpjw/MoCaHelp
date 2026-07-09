@@ -1,8 +1,8 @@
 Package: MoCaHelp
-Title: What the Package Does (One Line, Title Case)
+Title: Helper code for Mouse Cancer Sequencing (MoCaSeq) pipeline
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+    person("Marcus", "Wagner", , "marcus.wagner@tum.de", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
