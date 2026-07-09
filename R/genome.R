@@ -68,7 +68,7 @@ MM10_SEX_CHROMOSOME_SIZES <- c(
 #' Define chromosome sizes based on species.
 #'
 #' @param species Character name of spieces one of "Human" or "Mouse"
-#' @param only_autosomes Logical if to include only autosomes [default: TRUE]
+#' @param only_autosomes Logical if to include only autosomes. Default: TRUE
 define_chromosome_sizes <- function(species = "Human", only_autosomes = TRUE) {
   switch(
     species,
@@ -87,9 +87,10 @@ define_chromosome_sizes <- function(species = "Human", only_autosomes = TRUE) {
 
 #' Process count data from LOH
 #'
-#' @param chromosome_sizes
+#' @param chromosome_sizes Integer vector of chomosome sizes with chromosome 
+#' names
 #' @param count_data Character path to count data
-#' @param method Character
+#' @param method Character tool name for copy number calling or LOH.
 #' @note version 2 uses data.table::fread instead of read.table
 process_count_data <- function(
   chromosome_sizes,

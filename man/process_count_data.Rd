@@ -7,9 +7,12 @@
 process_count_data(chromosome_sizes, count_data = "", method = "")
 }
 \arguments{
+\item{chromosome_sizes}{Integer vector of chomosome sizes with chromosome
+names}
+
 \item{count_data}{Character path to count data}
 
-\item{method}{Character}
+\item{method}{Character tool name for copy number calling or LOH.}
 }
 \description{
 Process count data from LOH

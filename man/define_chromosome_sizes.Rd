@@ -9,7 +9,7 @@ define_chromosome_sizes(species = "Human", only_autosomes = TRUE)
 \arguments{
 \item{species}{Character name of spieces one of "Human" or "Mouse"}
 
-\item{only_autosomes}{Logical if to include only autosomes \link{default: TRUE}}
+\item{only_autosomes}{Logical if to include only autosomes. Default: TRUE}
 }
 \description{
 Define chromosome sizes based on species.
