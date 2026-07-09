@@ -214,6 +214,7 @@ detect_mocaseq_version <- function(results_path) {
 #' @param results_path Character, path to results for a certain sample.
 #' @return Character name of CNV caller one of "CNVKit", "HMMCopy" or
 #'  "CopyWriter".
+#' @export
 detect_mocaseq_cnv_caller <- function(results_path) {
   stopifnot(dir.exists(results_path))
   result_tools <- basename(list.dirs(results_path, recursive = FALSE))
@@ -438,6 +439,7 @@ get_mocaseq_cna_callers <- function(
 #' or "nextflow". Default: NULL (i.e. auto detect)
 #' @param keep_columns Character vector of column names to keep.
 #' @param ... Parameters used for data.table::fread() downstream.
+#' @export
 load_snv_file <- function(
   snv_file,
   pipeline_version = NULL,
