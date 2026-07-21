@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 # MoCaHelp
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/mpjw/MoCaHelp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mpjw/MoCaHelp/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/mpjw/MoCaHelp/graph/badge.svg)](https://app.codecov.io/gh/mpjw/MoCaHelp)
 <!-- badges: end -->
 
 The goal of MoCaHelp is to provide ancillary functions for working with MoCaSeq.

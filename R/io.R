@@ -367,7 +367,7 @@ get_mocaseq_path <- function(
     return(NULL)
   }
 
-  if (!exists("pipeline_version") || pipeline_version == NULL) {
+  if (!exists("pipeline_version") || is.null(pipeline_version)) {
     pipeline_version <- detect_mocaseq_version(results_path)
     if (verbose) print(paste("detected pipeline version", pipeline_version))
   }

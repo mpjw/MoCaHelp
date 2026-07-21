@@ -3,3 +3,4 @@
 export(detect_mocaseq_cnv_caller)
 export(get_mocaseq_path)
 export(load_snv_file)
+import(data.table)
