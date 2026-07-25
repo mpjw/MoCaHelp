@@ -9,11 +9,11 @@
 What the package does (one paragraph).
 }
 \author{
-\strong{Maintainer}: Marcus Wagner \email{marcus.wagner@tum.de}
+\strong{Maintainer}: Marcus Wagner \email{marcus.wagner@tum.de} (\href{https://orcid.org/0009-0000-9421-6766}{ORCID})
 
 Authors:
 \itemize{
-  \item Marcus Wagner \email{marcus.wagner@tum.de}
+  \item Marcus Wagner \email{marcus.wagner@tum.de} (\href{https://orcid.org/0009-0000-9421-6766}{ORCID})
 }
 
 }

@@ -2,7 +2,7 @@ Package: MoCaHelp
 Title: Helper code for Mouse Cancer Sequencing (MoCaSeq) pipeline
 Version: 0.0.0.9000
 Authors@R: 
-    person("Marcus", "Wagner", email = "marcus.wagner@tum.de", role = c("aut", "cre"))
+    person("Marcus", "Wagner", email = "marcus.wagner@tum.de", role = c("aut", "cre"),  comment = c(ORCID = "0009-0000-9421-6766"))
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
