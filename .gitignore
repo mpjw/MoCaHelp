@@ -6,3 +6,8 @@
 .quarto
 air.toml
 .vscode/
+inst/extdata/human/*
+!inst/extdata/human/GRCh38.p12.centromeres.bed
+!inst/extdata/human/GRCh38.p12.alternative.haplotypes.bed
+!inst/extdata/human/GRCh38.p12.poor.mappability.bed.gz
+inst/extdata/mouse/*
