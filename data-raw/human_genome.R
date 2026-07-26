@@ -31,7 +31,7 @@ GRCh38.p12.centromeres <- centromeres[, .(
   end,
   class = "centromere"
 )]
-usethis::use_data(GRCh38.p12.centromeres, overwrite = TRUE)
+usethis::use_data(GRCh38.p12.centromeres, compress = "gzip", overwrite = TRUE)
 
 # Alternative Haplotypes ------------------------------------------------------
 alt_haplotypes <- fread(
@@ -47,7 +47,11 @@ GRCh38.p12.alt.haplotypes <- alt_haplotypes[, .(
   end,
   class = "altHaplotype"
 )]
-usethis::use_data(GRCh38.p12.alt.haplotypes, overwrite = TRUE)
+usethis::use_data(
+  GRCh38.p12.alt.haplotypes,
+  compress = "gzip",
+  overwrite = TRUE
+)
 
 # Regions of Poor Mappabiltiy -------------------------------------------------
 # This data was created by Niklas de Andrade-Krätzig. Please refer to him for
@@ -66,4 +70,4 @@ GRCh38.p12.mappability <- mappability[, .(
   score = 1,
   class = "UmapS36"
 )]
-usethis::use_data(GRCh38.p12.mappability, overwrite = TRUE)
+usethis::use_data(GRCh38.p12.mappability, compress = "xz", overwrite = TRUE)
