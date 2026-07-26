@@ -5,3 +5,4 @@
 ^\.vscode$
 ^[.]?air[.]toml$
 ^\.github$
+^data-raw$
