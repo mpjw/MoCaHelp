@@ -1,10 +1,7 @@
-#' Genomic data and functions
-#'
-#' This script contains global genomic variables and genomic functions relevent
-#' to the MoCaSeq pipeline.
-#'
-#' @name genome.R
-NULL
+# Genomic data and functions
+#
+# This script contains global genomic variables and genomic functions relevent
+# to the MoCaSeq pipeline.
 
 # GRCh38p12 (hg38) chromosome lengths
 HG38_AUTOMOSOME_SIZES <- c(

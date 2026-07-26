@@ -1,7 +1,7 @@
-#' IO code for MoCaSeq
-#'
-#' Functions for building paths, and reading or writing data related to the
-#' MoCaSeq pipeline
+# IO code for MoCaSeq
+#
+# Functions for building paths, and reading or writing data related to the
+# MoCaSeq pipeline
 
 MUTECT2_COLUMN_NAMES_BASH <- c(
   "CHROM",

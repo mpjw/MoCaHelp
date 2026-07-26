@@ -1,7 +1,7 @@
-#' MoCaSeq pipeline metadata
-#'
-#' Metadata on MoCaSeq pipeline, including wich samples types can be processed,
-#' which tools are available, etc.
+# MoCaSeq pipeline metadata
+#
+# Metadata on MoCaSeq pipeline, including wich samples types can be processed,
+# which tools are available, etc.
 
 SAMPLE_TYPES <- c("Tumor", "matched", "Normal")
 
