@@ -477,3 +477,126 @@ load_snv_file <- function(
 
   .dt.snv
 }
+
+#' Load and standardize copy number segment data
+#'
+#' Reads the segment file, renames columns to a (parametrized) common schema,
+#' and standardizes chromosome names to characters of numbers (autosomes) or
+#' letters (sex chromosomes).
+#' This function wraps data.table::fread for reading the segment file.
+#'
+#' @param cns_file Character path to copy number segment (.cns) file. This is a
+#' tab separated file with chromosome, start, end, and mean (log2 CN) columns.
+#' @param cnv_method Character, name of copy number calling method. This
+#' software was developed for \code{"Copywriter"}, \code{"HMMCopy"}, and
+#' \code{"CNVKit"}. To use data from other CNV callers, use any other value here
+#' together with the \code{column_name_map} parameter.
+#' @param species Character, \code{"Human"} or \code{"Mouse"}.
+#' @param sample_id Character sample identifier.
+#' @param column_name_map Named character vector, specifying column renaming
+#' from input file. I.e. \code{c(foo="bar")} will rename column \code{bar} to
+#' \code{foo}.
+#' @param column_names Character vector, specifying column names of returned
+#' segment data.table. Needs to match \code{names(column_name_map)}.
+#' Assumed 1 to 4 to be chromosome, start, end and mean CN value names.
+#' Suggested standard: \code{c("chromosome", "start", "end", "mean_log2")}.
+#' @param ... parameters passed down to data.table::fread()
+#'
+#' @return A \code{data.table} with columns:
+#'   \code{chr, start, end, mean_log2} (and \code{gene} for CNVKit).
+#'
+#' @importFrom data.table fread
+#' @importFrom data.table setnames
+#' @export
+load_segments <- function(
+  cns_file,
+  cnv_method = NULL,
+  species = NULL,
+  sample_id = NULL,
+  column_name_map = NULL,
+  column_names = c("chromosome", "start", "end", "mean_log2"),
+  ...
+) {
+  # read segment file
+  segments <- data.table::fread(cns_file, ...)
+
+  if (nrow(segments) == 0L) {
+    warning(paste0("Empty segment file: ", cns_file))
+  }
+
+  # rename columns
+  switch(
+    cnv_method,
+    # CNVKit annotates list of genes in the segment
+    CNVKit = data.table::setnames(
+      x = segments,
+      old = c("chromosome", "start", "end", "log2", "gene"),
+      new = c(column_names, "gene")
+    ),
+    # Copywriter & HMMCopy both have 4-column output: Chrom, Start, End, Mean
+    Copywriter = ,
+    HMMCopy = data.table::setnames(
+      x = segments,
+      old = c("Chrom", "Start", "End", "Mean"),
+      new = column_names
+    ),
+    # Data from other CNV methods need to be loaded using a column name map
+    if (
+      is.null(column_name_map) ||
+        any(names(column_name_map)[1:length(column_names)] != column_names)
+    ) {
+      column_name_map_str <- paste0(
+        names(column_name_map)[1:4],
+        collapse = ","
+      )
+      column_names_str <- paste0(column_names, collapse = ",")
+      stop(paste0(
+        "Problem with column_name_map while trying to load data from ",
+        "custom copy number caller. Got column names '",
+        column_name_map_str,
+        "' while expecting '",
+        column_names_str,
+        "'. Maybe the mapping direction",
+        " is inverted. Be sure to use c(expected_column=\"your_column\")."
+      ))
+    } else {
+      # using custom CNV caller column name mapping to filter and adapt
+      data.table::setnames(
+        segments,
+        column_name_map,
+        names(column_name_map)
+      )
+      # make sure column order starts with chr, start, end, mean_log2, ...
+      new_col_order <- unique(union(column_names, names(column_name_map)))
+      segments <- segments[, new_col_order, with = FALSE]
+    }
+  )
+
+  # standardize chromosome names (as character and with no 'chr' prefix)
+  segments[, chr := as.character(chr)]
+  segments[, chr := gsub("^chr", "", chr)]
+
+  # numeric sex-chromosome conversion
+  if (!is.null(species)) {
+    if (species == "Mouse") {
+      segments[chr == "20", chr := "X"]
+      segments[chr == "21", chr := "Y"]
+    } else if (species == "Human") {
+      segments[chr == "23", chr := "X"]
+      segments[chr == "24", chr := "Y"]
+    }
+  }
+
+  # add segment identifier as 'chromosome_start_end'
+  # segments[,
+  #   segment_id := do.call(what = paste, args = c(.SD, sep = "_")),
+  #   .SDcols = column_names[1:3]
+  # ]
+
+  # add sample_id info
+  if (!is.null(sample_id)) {
+    segments[, sample_id := sample_id]
+  }
+
+  segments
+}
