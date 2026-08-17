@@ -1,9 +1,11 @@
 Package: MoCaHelp
-Title: Helper code for Mouse Cancer Sequencing (MoCaSeq) pipeline
-Version: 0.0.0.9000
+Title: Helper Code for MoCaSeq pipeline
+Version: 0.0.1
 Authors@R: 
     person("Marcus", "Wagner", email = "marcus.wagner@tum.de", role = c("aut", "cre"),  comment = c(ORCID = "0009-0000-9421-6766"))
-Description: What the package does (one paragraph).
+Description: This package provides standard functions for downstram analyses of MoCaSeq.
+    It includes loading and wrangling data from MoCaSeq output, getting some metadata,
+    and loading smaller reference genome data (e.g. centromere regions).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

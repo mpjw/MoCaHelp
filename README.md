@@ -20,8 +20,8 @@ You can install the development version of MoCaHelp from
 [GitHub](https://github.com/mpjw/MoCaHelp) with:
 
 ``` r
-# install.packages("pak")
-pak::pak("mpjw/MoCaHelp")
+# alternatively install using pak::pak("mpjw/MoCaHelp")
+remotes::install_github("mpjw/MoCaHelp")
 ```
 
 ## Example

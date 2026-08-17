@@ -4,9 +4,9 @@
 \name{MoCaHelp-package}
 \alias{MoCaHelp}
 \alias{MoCaHelp-package}
-\title{MoCaHelp: Helper code for Mouse Cancer Sequencing (MoCaSeq) pipeline}
+\title{MoCaHelp: Helper Code for MoCaSeq pipeline}
 \description{
-What the package does (one paragraph).
+This package provides standard functions for downstram analyses of MoCaSeq. It includes loading and wrangling data from MoCaSeq output, getting some metadata, and loading smaller reference genome data (e.g. centromere regions).
 }
 \author{
 \strong{Maintainer}: Marcus Wagner \email{marcus.wagner@tum.de} (\href{https://orcid.org/0009-0000-9421-6766}{ORCID})
