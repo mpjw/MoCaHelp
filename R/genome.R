@@ -82,32 +82,35 @@ define_chromosome_sizes <- function(species = "Human", only_autosomes = TRUE) {
   )
 }
 
-#' Process count data from LOH
-#'
-#' Version 2 uses data.table::fread instead of read.table.
-#' TODO: remove undefined dependencies
-#'
-#' @param chromosome_sizes Integer vector of chomosome sizes with chromosome
-#' names
-#' @param count_data Character path to count data
-#' @param method Character tool name for copy number calling or LOH.
-process_count_data <- function(
-  chromosome_sizes,
-  count_data = "",
-  method = ""
-) {
-  out_list <- list()
-  count_data <- data.table::fread(count_data, header = TRUE, sep = "\t")
-  SetVariableNames(method)
-  out_list <- ConvertGenomicCords(
-    data.frame(count_data),
-    chromosome_sizes,
-    Start,
-    CopyNumber,
-    Chromosome
-  )
-  return(out_list)
-}
+# #' Process count data from LOH
+# #'
+# #' Version 2 uses data.table::fread instead of read.table.
+# #' TODO: remove undefined dependencies
+# #'
+# #' @param chromosome_sizes Integer vector of chomosome sizes with chromosome
+# #' names
+# #' @param count_data Character path to count data
+# #' @param method Character tool name for copy number calling or LOH.
+# process_count_data <- function(
+#   chromosome_sizes,
+#   count_data = "",
+#   method = ""
+# ) {
+#   # avoid NOTEs in R CMD check due to NSE
+#   chr <- NULL
+
+#   out_list <- list()
+#   count_data <- data.table::fread(count_data, header = TRUE, sep = "\t")
+#   SetVariableNames(method)
+#   out_list <- ConvertGenomicCords(
+#     data.frame(count_data),
+#     chromosome_sizes,
+#     Start,
+#     CopyNumber,
+#     Chromosome
+#   )
+#   return(out_list)
+# }
 
 #' Convert genomic coordinates to a single continuous x axis for plotting
 #'
@@ -116,6 +119,9 @@ process_count_data <- function(
 #' * start
 #' * end
 convert_genomic_to_continuous_axis <- function(dt_bins) {
+  # avoid NOTEs in R CMD check due to NSE
+  Chrom <- start <- end <- plotstart <- plotend <- NULL
+
   dt_bins[, Chrom := as.numeric(Chrom)]
   data.table::setorder(dt_bins, Chrom)
   dt_bins[, start := as.numeric(start)]

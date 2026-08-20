@@ -517,6 +517,9 @@ load_segments <- function(
   column_names = c("chromosome", "start", "end", "mean_log2"),
   ...
 ) {
+  # avoid NOTEs in R CMD check due to NSE
+  chr <- NULL
+
   # read segment file
   segments <- data.table::fread(cns_file, ...)
 
