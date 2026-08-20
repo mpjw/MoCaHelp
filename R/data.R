@@ -89,7 +89,7 @@ load_genomic_regions <- function(
   # load data
   .env <- new.env()
   data_set <- paste0(ref_genome, ".", region_type)
-  utils::data(list = data_set, envir = .env)[1]
+  utils::data(list = data_set, envir = .env, package = "MoCaHelp")[1]
   regions <- .env[[data_set]]
 
   # convert to genomic ranges object if requested
