@@ -6,3 +6,4 @@
 ^[.]?air[.]toml$
 ^\.github$
 ^data-raw$
+^TODO.md$
