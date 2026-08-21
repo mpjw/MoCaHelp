@@ -1,6 +1,6 @@
 Package: MoCaHelp
 Title: Helper Code for MoCaSeq pipeline
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: 
     person("Marcus", "Wagner", email = "marcus.wagner@tum.de", role = c("aut", "cre"),  comment = c(ORCID = "0009-0000-9421-6766"))
 Description: This package provides standard functions for downstram analyses of MoCaSeq.

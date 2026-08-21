@@ -4,7 +4,8 @@ test_that("get_mocaseq_path works for LOH", {
     sample_type = "matched",
     tool_name = "LOH",
     base_path = "/storage/path",
-    ignore_not_existing = TRUE
+    ignore_not_existing = TRUE,
+    sample_mode = "matched"
   )
 
   expect_equal(

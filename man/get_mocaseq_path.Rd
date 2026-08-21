@@ -8,6 +8,8 @@ get_mocaseq_path(
   sample_name,
   sample_type,
   tool_name,
+  pipeline_version = NULL,
+  sample_mode = NULL,
   base_path = ".",
   variant_type = "mixed",
   ignore_not_existing = FALSE,
@@ -22,6 +24,13 @@ get_mocaseq_path(
 
 \item{tool_name}{Character name of tool from MoCaSeq pipeline}
 
+\item{pipeline_version}{Character name of MoCaSeq pipeline version to assume.
+I.e. one of "bash" or "nextflow". Will be inferred by default (NULL).}
+
+\item{sample_mode}{Character of mode used for processing sample. I.e.
+"single" for only tumor sample, or "matched" for healthy-tumor sample pair.
+By default (NULL) this will be inferred.}
+
 \item{base_path}{Character of path to directory with MoCaSeq output}
 
 \item{variant_type}{Character type of variants to get. One of "germline",
@@ -33,14 +42,12 @@ raised and NULL returned. Default: FALSE}
 
 \item{verbose}{Logical, wether to print details during execution.}
 
-\item{...}{Downstream parameter, specific to tool specific functions
-
-TODO: expand/recycle parameters other than sample_name if multiple sample
-names are provided}
+\item{...}{Downstream parameter, specific to tool specific functions}
 }
 \value{
 Character path to described file, or NULL
 }
 \description{
-Construct path for MoCaSeq result file
+TODO: expand/recycle parameters other than sample_name if multiple sample
+names are provided
 }
