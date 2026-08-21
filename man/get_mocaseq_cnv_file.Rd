@@ -6,6 +6,7 @@
 \usage{
 get_mocaseq_cnv_file(
   sample_name,
+  sample_mode,
   sample_type,
   cnv_caller,
   result_type = "segments",
@@ -14,6 +15,8 @@ get_mocaseq_cnv_file(
 }
 \arguments{
 \item{sample_name}{Character, name of sample}
+
+\item{sample_mode}{Character, mode of sample (i.e. "matched" or "single")}
 
 \item{sample_type}{Character, type of sample ("Tumor", "Normal", or
 "matched")}

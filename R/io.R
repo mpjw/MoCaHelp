@@ -189,56 +189,13 @@ get_mocaseq_snv_file <- function(
   }
 }
 
-#' Detect MoCaSeq pipeline version
-#'
-#' @param results_path Character path to results for a given sample. I.e. this
-#' path should end with sample_id/results
-#' @return Character 'bash', or 'nextflow' indicating MoCaSeq pipeline version
-detect_mocaseq_version <- function(results_path) {
-  bash_qc_exists <- dir.exists(file.path(results_path, "QC"))
-  matched_files <- Sys.glob(file.path(results_path, "*", "*.matched.*"))
-  if (bash_qc_exists || length(matched_files) == 0) {
-    "bash"
-  } else {
-    "nextflow"
-  }
-}
-
-#' Detect CNV caller in MoCaSeq results
-#'
-#' MoCaSeq employs CNVKit, HMMCopy and Copywriter for calling copy number
-#' variations (CNVs). It stores any results under \code{sample_name/results/} in
-#' a subfolder with the respective \code{tool_name}. This function exploits this
-#' structure by searching all available tools for a CNV caller.
-#'
-#' @param results_path Character, path to results for a certain sample.
-#' @return Character name of CNV caller one of "CNVKit", "HMMCopy" or
-#'  "CopyWriter".
-#' @export
-detect_mocaseq_cnv_caller <- function(results_path) {
-  stopifnot(dir.exists(results_path))
-  result_tools <- basename(list.dirs(results_path, recursive = FALSE))
-  if ("CNVKit" %in% result_tools) {
-    "CNVKit"
-  } else if ("HMMCopy" %in% result_tools) {
-    "HMMCopy"
-  } else if ("Copywriter" %in% result_tools) {
-    "Copywriter"
-  } else {
-    stop(paste0(
-      "Cannot detect CNV caller from MoCaSeq output! ",
-      "No CNV caller found in: ",
-      results_path
-    ))
-  }
-}
-
 #' Build path to copy number segments file.
 #'
 #' Copy number segment (cns) files produced by MoCaSeq can be either from
 #' CNVKit, HMMcopy, or CopyWriter. This function resolves possible cns files.
 #'
 #' @param sample_name Character, name of sample
+#' @param sample_mode Character, mode of sample (i.e. "matched" or "single")
 #' @param sample_type Character, type of sample ("Tumor", "Normal", or
 #'  "matched")
 #' @param cnv_caller Character, name of CNV caller ("CNVKit", "HMMCopy" or
@@ -248,16 +205,22 @@ detect_mocaseq_cnv_caller <- function(results_path) {
 #'  of \code{cnv_caller = "HMMCopy"}.
 get_mocaseq_cnv_file <- function(
   sample_name,
+  sample_mode,
   sample_type,
   cnv_caller,
   result_type = "segments",
   seg_size = 20000
 ) {
-  stopifnot(sample_type %in% c("matched", "Tumor", "Normal"))
+  stopifnot(sample_mode %in% SAMPLE_MODES)
+  stopifnot(sample_type %in% SAMPLE_TYPES)
   if (result_type == "segments") {
     switch(
       cnv_caller,
-      CNVKit = file.path(sample_type, paste0(sample_name, ".cns")),
+      CNVKit = if (sample_type == "matched") {
+        file.path(sample_mode, paste0(sample_name, ".cns"))
+      } else {
+        file.path(sample_mode, paste0(sample_name, ".", sample_type, ".cns"))
+      },
       HMMCopy = paste0(
         c(sample_name, "HMMCopy", seg_size, "segments", "txt"),
         collapse = "."
@@ -271,7 +234,11 @@ get_mocaseq_cnv_file <- function(
   } else if (result_type == "ratios") {
     switch(
       cnv_caller,
-      CNVKit = file.path(sample_type, paste0(sample_name, ".cnr")),
+      CNVKit = if (sample_type == "matched") {
+        file.path(sample_mode, paste0(sample_name, ".cnr"))
+      } else {
+        file.path(sample_mode, paste0(sample_name, ".", sample_type, ".cnr"))
+      },
       HMMCopy = paste0(
         c(sample_name, "HMMCopy", seg_size, "log2RR", "txt"),
         collapse = "."
@@ -369,7 +336,12 @@ get_mocaseq_path <- function(
 
   if (!exists("pipeline_version") || is.null(pipeline_version)) {
     pipeline_version <- detect_mocaseq_version(results_path)
-    if (verbose) print(paste("detected pipeline version", pipeline_version))
+    if (verbose) print(paste("detected pipeline version:", pipeline_version))
+  }
+
+  if (!exists("sample_mode") || is.null(sample_mode)) {
+    sample_mode <- detect_sample_mode(results_path)
+    if (verbose) print(paste("detected sample mode:", sample_mode))
   }
 
   file_name <- switch(
@@ -386,6 +358,7 @@ get_mocaseq_path <- function(
     HMMCopy = ,
     Copywriter = get_mocaseq_cnv_file(
       sample_name,
+      sample_mode,
       sample_type,
       cnv_caller = tool_name,
       ...
