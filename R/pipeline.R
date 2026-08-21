@@ -3,15 +3,19 @@
 # Metadata on MoCaSeq pipeline, including wich samples types can be processed,
 # which tools are available, etc.
 
+PIPELINE_VERSIONS <- c("bash", "nextflow")
+
 SAMPLE_TYPES <- c("Tumor", "matched", "Normal")
 
 SAMPLE_MODES <- c("single", "matched")
+
+VARIANT_TYPES <- c("mixed", "germline", "somatic")
 
 NUCLEOTIDE_VARIANT_TOOLS <- c("Mutect2", "Strelka")
 
 COPY_NUMBER_CALLERS <- c("CNVKit", "Copywriter", "HMMCopy")
 
-MOCASEQ_TOOLS <- c(NUCLEOTIDE_VARIANT_TOOLS, COPY_NUMBER_CALLERS, "LOH")
+PIPELINE_TOOLS <- c(NUCLEOTIDE_VARIANT_TOOLS, COPY_NUMBER_CALLERS, "LOH")
 
 #' Detect MoCaSeq pipeline version
 #'
@@ -40,12 +44,12 @@ detect_sample_mode <- function(results_path) {
 
   if (detect_mocaseq_version(results_path) == "bash") {
     # check QC file for bash version
-    qc_report <- grep(
-      "report.txt",
-      list.files(file.path(results_path, "QC"), full.names = TRUE),
-      value = TRUE
+    qc_report <- list.files(
+      file.path(results_path, "QC"),
+      pattern = "report.txt",
+      full.names = TRUE
     )
-    if (file.exists(qc_report)) {
+    if (length(qc_report) > 0 && file.exists(qc_report)) {
       mode_line <- grep(
         "mode",
         readLines(file(qc_report), n = 25),
@@ -59,7 +63,7 @@ detect_sample_mode <- function(results_path) {
       stop(paste0(
         "No QC report in ",
         results_path,
-        "! Assuming results are compromized"
+        "!\n Assuming results are compromized!"
       ))
     }
   } else {

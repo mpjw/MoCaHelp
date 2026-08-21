@@ -297,9 +297,17 @@ get_mocaseq_loh_file <- function(
 
 #' Construct path for MoCaSeq result file
 #'
+#' TODO: expand/recycle parameters other than sample_name if multiple sample
+#' names are provided
+#'
 #' @param sample_name Character name of sample from MoCaSeq run
 #' @param sample_type Character sample type, one of Tumor, matched or Normal
 #' @param tool_name Character name of tool from MoCaSeq pipeline
+#' @param pipeline_version Character name of MoCaSeq pipeline version to assume.
+#' I.e. one of "bash" or "nextflow". Will be inferred by default (NULL).
+#' @param sample_mode Character of mode used for processing sample. I.e.
+#' "single" for only tumor sample, or "matched" for healthy-tumor sample pair.
+#' By default (NULL) this will be inferred.
 #' @param base_path Character of path to directory with MoCaSeq output
 #' @param variant_type Character type of variants to get. One of "germline",
 #' "somatic", or "mixed". Default: "mixed"
@@ -309,14 +317,14 @@ get_mocaseq_loh_file <- function(
 #' @param verbose Logical, wether to print details during execution.
 #' @param ... Downstream parameter, specific to tool specific functions
 #'
-#' TODO: expand/recycle parameters other than sample_name if multiple sample
-#' names are provided
 #' @returns Character path to described file, or NULL
 #' @export
 get_mocaseq_path <- function(
   sample_name,
   sample_type,
   tool_name,
+  pipeline_version = NULL,
+  sample_mode = NULL,
   base_path = ".",
   variant_type = "mixed",
   ignore_not_existing = FALSE,
@@ -324,9 +332,8 @@ get_mocaseq_path <- function(
   ...
 ) {
   stopifnot(sample_type %in% SAMPLE_TYPES)
-  stopifnot(variant_type %in% c("mixed", "germline", "somatic"))
-  # paste0("Unknown sample type: '", sample_type, "'! Expected:", SAMPLE_TYPES)
-  stopifnot(tool_name %in% MOCASEQ_TOOLS)
+  stopifnot(variant_type %in% VARIANT_TYPES)
+  stopifnot(tool_name %in% PIPELINE_TOOLS)
   results_path <- file.path(base_path, sample_name, "results")
 
   if (!dir.exists(results_path) && !ignore_not_existing) {
@@ -334,15 +341,17 @@ get_mocaseq_path <- function(
     return(NULL)
   }
 
-  if (!exists("pipeline_version") || is.null(pipeline_version)) {
+  if (is.null(pipeline_version)) {
     pipeline_version <- detect_mocaseq_version(results_path)
     if (verbose) print(paste("detected pipeline version:", pipeline_version))
   }
+  stopifnot(pipeline_version %in% PIPELINE_VERSIONS)
 
-  if (!exists("sample_mode") || is.null(sample_mode)) {
+  if (is.null(sample_mode)) {
     sample_mode <- detect_sample_mode(results_path)
     if (verbose) print(paste("detected sample mode:", sample_mode))
   }
+  stopifnot(sample_mode %in% SAMPLE_MODES)
 
   file_name <- switch(
     tool_name,
